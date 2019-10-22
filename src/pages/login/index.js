@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Image, StyleSheet } from 'react-native';
 import { Container, Header, Content, Form, Item, Input, Label, Left, Title, Body, Right, Button, Text } from 'native-base';
 import { StackActions, NavigationActions } from 'react-navigation';
-import AsyncStorage from '@react-native-community/async-storage';
+// import AsyncStorage from '@react-native-community/async-storage';
 
 // import { storeData, getData } from "../../services/storage"
 import api from "../../services/api";
@@ -38,7 +38,7 @@ export default class Login extends Component {
             NavigationActions.navigate({ routeName: 'Main' }),
           ],
         });
-        await AsyncStorage.setItem("user", JSON.stringify(response.data))
+        // await AsyncStorage.setItem("user", JSON.stringify(response.data))
         // storeData("user", response.data)
         this.props.navigation.dispatch(resetAction);
       } catch (_err) {
@@ -49,7 +49,7 @@ export default class Login extends Component {
   };
 
   checaLogin = async () => {
-    const user = await AsyncStorage.getItem("user");
+    // const user = await AsyncStorage.getItem("user");
     if (user) {
       const resetAction = StackActions.reset({
         index: 0,
