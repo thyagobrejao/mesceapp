@@ -2,10 +2,14 @@ import React, { Component } from 'react';
 import { Image, StyleSheet } from 'react-native';
 import { Container, Header, Content, Form, Item, Input, Label, Left, Title, Body, Right, Button, Text } from 'native-base';
 import { StackActions, NavigationActions } from 'react-navigation';
+import AsyncStorage from '@react-native-community/async-storage';
+
+// import { storeData, getData } from "../../services/storage"
+import api from "../../services/api";
 
 export default class Login extends Component {
   static navigationOptions = {
-    header: null,
+    title: "Login",
   };
   state = {
     email: '',
@@ -23,7 +27,7 @@ export default class Login extends Component {
       this.setState({ error: 'Preencha usuário e senha para continuar!' }, () => false);
     } else {
       try {
-        const response = await api.post('/sessions', {
+        const response = await api.post('/login', {
           email: this.state.email,
           password: this.state.password,
         });
@@ -31,15 +35,35 @@ export default class Login extends Component {
         const resetAction = StackActions.reset({
           index: 0,
           actions: [
-            NavigationActions.navigate({ routeName: 'Main', params: { token: response.data.token } }),
+            NavigationActions.navigate({ routeName: 'Main' }),
           ],
         });
+        await AsyncStorage.setItem("user", JSON.stringify(response.data))
+        // storeData("user", response.data)
         this.props.navigation.dispatch(resetAction);
       } catch (_err) {
         this.setState({ error: 'Houve um problema com o login, verifique suas credenciais!' });
+        console.log(_err);
       }
     }
   };
+
+  checaLogin = async () => {
+    const user = await AsyncStorage.getItem("user");
+    if (user) {
+      const resetAction = StackActions.reset({
+        index: 0,
+        actions: [
+          NavigationActions.navigate({ routeName: 'Main' }),
+        ],
+      });
+    }
+  }
+
+  componentDidMount() {
+    this.checaLogin;
+  };
+
   render() {
 
     return (
@@ -57,7 +81,7 @@ export default class Login extends Component {
         </Header>
         <Content>
           <Image
-            style={{ marginTop: 30, marginBottom: 20, height: 300, width: null, flex: 1 }}
+            style={{ marginBottom: 20, height: 300, width: null, flex: 1 }}
             source={require('../../images/distribuindo-comunhao-transparente2.png')}
           />
           <Form>
@@ -82,10 +106,17 @@ export default class Login extends Component {
                 secureTextEntry
               />
             </Item>
-            <Button block style={styles.loginButton}>
+            {this.state.error.length !== 0 && <Text style={styles.ErrorMessage}>{this.state.error}</Text>}
+            <Button block
+              style={styles.loginButton}
+              onPress={this.handleSignInPress}
+            >
               <Text>Entrar</Text>
             </Button>
           </Form>
+          <Button transparent light style={styles.loginButton}>
+              <Text>Recuperar Senha</Text>
+            </Button>
         </Content>
       </Container>
     );
@@ -103,5 +134,13 @@ const styles = StyleSheet.create({
     marginTop: 30,
     width: "90%",
     marginLeft: 20,
+  },
+
+  ErrorMessage: {
+    textAlign: "center",
+    color: "#ce2029",
+    fontSize: 16,
+    marginTop: 30,
+    marginHorizontal: 20,
   },
 });
