@@ -5,11 +5,14 @@ import { StackActions, NavigationActions } from 'react-navigation';
 import { storeData, getData } from "../../services/storage"
 import api from "../../services/api";
 
+var _ = require('lodash');
+
 export default class Login extends Component {
   static navigationOptions = {
     title: "Login",
   };
   state = {
+    user: {},
     email: '',
     password: '',
     error: '',
@@ -49,8 +52,14 @@ export default class Login extends Component {
   };
 
   checaLogin = async () => {
-    const user = getData("user");
-    if (user) {
+    console.log(this.state.user);
+    const user = getData("user").then((data) => {
+      this.setState({
+        user: data,
+      })
+    });
+    console.log(_.isEmpty(this.state.user));
+    if (!_.isEmpty(this.state.user)) {
       this.props.navigation.dispatch(this.resetAction());
     }
   }
