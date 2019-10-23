@@ -3,7 +3,7 @@ import { createAppContainer } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 
 import Login from './pages/login';
-import Main from './pages/main';
+import Main from './pages/main/routes';
 
 const App = createStackNavigator({
   //Constant which holds all the screens like index of any book 
@@ -13,6 +13,7 @@ const App = createStackNavigator({
 },
   {
     initialRouteName: 'Login',
+    headerMode: 'none',
   }
 );
 

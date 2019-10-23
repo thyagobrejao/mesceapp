@@ -2,9 +2,7 @@ import React, { Component } from 'react';
 import { Image, StyleSheet } from 'react-native';
 import { Container, Header, Content, Form, Item, Input, Label, Left, Title, Body, Right, Button, Text } from 'native-base';
 import { StackActions, NavigationActions } from 'react-navigation';
-// import AsyncStorage from '@react-native-community/async-storage';
-
-// import { storeData, getData } from "../../services/storage"
+import { storeData, getData } from "../../services/storage"
 import api from "../../services/api";
 
 export default class Login extends Component {
@@ -22,6 +20,14 @@ export default class Login extends Component {
   handlePasswordChange = (password) => {
     this.setState({ password });
   };
+
+  resetAction = () => StackActions.reset({
+    index: 0,
+    actions: [
+      NavigationActions.navigate({ routeName: 'Main' }),
+    ],
+  });
+
   handleSignInPress = async () => {
     if (this.state.email.length === 0 || this.state.password.length === 0) {
       this.setState({ error: 'Preencha usuário e senha para continuar!' }, () => false);
@@ -32,15 +38,9 @@ export default class Login extends Component {
           password: this.state.password,
         });
 
-        const resetAction = StackActions.reset({
-          index: 0,
-          actions: [
-            NavigationActions.navigate({ routeName: 'Main' }),
-          ],
-        });
         // await AsyncStorage.setItem("user", JSON.stringify(response.data))
-        // storeData("user", response.data)
-        this.props.navigation.dispatch(resetAction);
+        storeData("user", response.data)
+        this.props.navigation.dispatch(this.resetAction());
       } catch (_err) {
         this.setState({ error: 'Houve um problema com o login, verifique suas credenciais!' });
         console.log(_err);
@@ -49,19 +49,14 @@ export default class Login extends Component {
   };
 
   checaLogin = async () => {
-    // const user = await AsyncStorage.getItem("user");
+    const user = getData("user");
     if (user) {
-      const resetAction = StackActions.reset({
-        index: 0,
-        actions: [
-          NavigationActions.navigate({ routeName: 'Main' }),
-        ],
-      });
+      this.props.navigation.dispatch(this.resetAction());
     }
   }
 
   componentDidMount() {
-    this.checaLogin;
+    this.checaLogin();
   };
 
   render() {
@@ -115,8 +110,8 @@ export default class Login extends Component {
             </Button>
           </Form>
           <Button transparent light style={styles.loginButton}>
-              <Text>Recuperar Senha</Text>
-            </Button>
+            <Text>Recuperar Senha</Text>
+          </Button>
         </Content>
       </Container>
     );
