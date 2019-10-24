@@ -12,7 +12,6 @@ export default class Login extends Component {
     title: "Login",
   };
   state = {
-    user: {},
     email: '',
     password: '',
     error: '',
@@ -40,8 +39,7 @@ export default class Login extends Component {
           email: this.state.email,
           password: this.state.password,
         });
-
-        // await AsyncStorage.setItem("user", JSON.stringify(response.data))
+        
         storeData("user", response.data)
         this.props.navigation.dispatch(this.resetAction());
       } catch (_err) {
@@ -52,16 +50,11 @@ export default class Login extends Component {
   };
 
   checaLogin = async () => {
-    console.log(this.state.user);
-    const user = getData("user").then((data) => {
-      this.setState({
-        user: data,
-      })
+    getData("user").then((data) => {
+      if (!_.isEmpty(data)) {
+        this.props.navigation.dispatch(this.resetAction());
+      }
     });
-    console.log(_.isEmpty(this.state.user));
-    if (!_.isEmpty(this.state.user)) {
-      this.props.navigation.dispatch(this.resetAction());
-    }
   }
 
   componentDidMount() {

@@ -1,26 +1,56 @@
 import React, { Component } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, FlatList } from 'react-native';
 import { Container, Content, Card, CardItem, Body, Text, H1 } from 'native-base';
+import moment from 'moment';
 import { getData } from "../../services/storage"
+import api from "../../services/api";
 
 export default class Main extends Component {
-    // static navigationOptions = {
-    //     header: null,
-    // };
 
     state = {
         user: {},
-        proximasEscalas: [],
+        dados: {},
+    };
+
+    atualizaDados = async () => {
+        try {
+            const response = await api.get('escalas', {
+                params: {
+                    api_token: this.state.user.api_token,
+                }
+            });
+            this.setState({
+                dados: response.data,
+            })
+            // storeData("user", response.data)
+        } catch (_err) {
+            // this.setState({ error: 'Houve um problema com o login, verifique suas credenciais!' });
+            console.log(_err.response);
+        }
     };
 
     componentDidMount() {
-        const user = getData("user")
+        getData("user")
             .then((data) => {
                 this.setState({
-                    user: data,
+                    user: data
                 })
+                this.atualizaDados();
             });
     }
+
+    renderEscalas = ({ item }) => (
+        <Text>{moment(item.data).format("DD/MM/YYYY")} - {item.missas.horario}</Text>
+    )
+
+    renderEscalasExtras = ({ item }) => (
+        <Text>{moment(item.data).format("DD/MM/YYYY")} - {item.tipo} - {item.descricao}</Text>
+    )
+
+    vazio = () => (
+        <Text>Nenhum ítem foi encontrado.</Text>
+    )
+
     render() {
         return (
             <Container>
@@ -28,13 +58,26 @@ export default class Main extends Component {
                     <H1 style={styles.H1}>{this.state.user.name}</H1>
                     <Card style={styles.Card}>
                         <CardItem header style={styles.CardHeader}>
+                            <Text style={styles.textoBranco}>Avisos</Text>
+                        </CardItem>
+                        <CardItem>
+                            <Body>
+                                <Text>Novena dia 31</Text>
+                            </Body>
+                        </CardItem>
+                    </Card>
+                    <Card style={styles.Card}>
+                        <CardItem header style={styles.CardHeader}>
                             <Text style={styles.textoBranco}>Próximas Escalas</Text>
                         </CardItem>
                         <CardItem>
                             <Body>
-                                <Text>09/11/2019 - 19:00</Text>
-                                <Text>13/11/2019 - 19:00</Text>
-                                <Text>17/11/2019 - 17:00</Text>
+                                <FlatList
+                                    data={this.state.dados.escalas}
+                                    keyExtractor={item => item.id}
+                                    renderItem={this.renderEscalas}
+                                    ListEmptyComponent={this.vazio}
+                                />
                             </Body>
                         </CardItem>
                     </Card>
@@ -44,9 +87,12 @@ export default class Main extends Component {
                         </CardItem>
                         <CardItem>
                             <Body>
-                                <Text>09/11/2019 - 19:00</Text>
-                                <Text>13/11/2019 - 19:00</Text>
-                                <Text>17/11/2019 - 17:00</Text>
+                                <FlatList
+                                    data={this.state.dados.escalasExtras}
+                                    keyExtractor={item => item.id}
+                                    renderItem={this.renderEscalasExtras}
+                                    ListEmptyComponent={this.vazio}
+                                />
                             </Body>
                         </CardItem>
                     </Card>
