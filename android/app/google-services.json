@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "241126095080",
+    "firebase_url": "https://mesceapp.firebaseio.com",
+    "project_id": "mesceapp",
+    "storage_bucket": "mesceapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:241126095080:android:378580f96531fcb07cb15d",
+        "android_client_info": {
+          "package_name": "com.mesceapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "241126095080-na0jb23p6fhr26u1ummirl38rakcercb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mesceapp",
+            "certificate_hash": "abd032faa8621d07be46fc4654c14d54f06f0c0c"
+          }
+        },
+        {
+          "client_id": "241126095080-055l4lttb1ackksp6v23o8upgc81p5rj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBX7ZATA63DbAsXmtCp8EGcI9VRjx1KlQ8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "241126095080-055l4lttb1ackksp6v23o8upgc81p5rj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

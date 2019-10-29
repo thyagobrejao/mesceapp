@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import { Image, StyleSheet } from 'react-native';
-import { Container, Header, Content, Form, Item, Input, Label, Left, Title, Body, Right, Button, Text } from 'native-base';
+import { Container, Header, Content, Form, Item, Input, Label, Left, Title, Body, Right, Button, Text, Spinner } from 'native-base';
 import { StackActions, NavigationActions } from 'react-navigation';
 import { storeData, getData } from "../../services/storage"
 import api from "../../services/api";
+
+import OneSignal from 'react-native-onesignal';
 
 var _ = require('lodash');
 
@@ -15,7 +17,38 @@ export default class Login extends Component {
     email: '',
     password: '',
     error: '',
+    loadingLogin: false,
   };
+
+  constructor(properties) {
+    super(properties);
+    OneSignal.init("a5827a73-6ce4-4c27-8b92-cb09c99caf2c");
+    OneSignal.addEventListener('received', this.onReceived);
+    OneSignal.addEventListener('opened', this.onOpened);
+    OneSignal.addEventListener('ids', this.onIds);
+  }
+
+  componentWillUnmount() {
+    OneSignal.removeEventListener('received', this.onReceived);
+    OneSignal.removeEventListener('opened', this.onOpened);
+    OneSignal.removeEventListener('ids', this.onIds);
+  }
+
+  onReceived(notification) {
+    console.log("Notification received: ", notification);
+  }
+
+  onOpened(openResult) {
+    console.log('Message: ', openResult.notification.payload.body);
+    console.log('Data: ', openResult.notification.payload.additionalData);
+    console.log('isActive: ', openResult.notification.isAppInFocus);
+    console.log('openResult: ', openResult);
+  }
+
+  onIds(device) {
+    console.log('Device info: ', device);
+  }
+
   handleEmailChange = (email) => {
     this.setState({ email });
   };
@@ -35,15 +68,22 @@ export default class Login extends Component {
       this.setState({ error: 'Preencha usuário e senha para continuar!' }, () => false);
     } else {
       try {
-        const response = await api.post('/login', {
+        this.setState({
+          loadingLogin: true,
+        });
+        await api.post('/login', {
           email: this.state.email,
           password: this.state.password,
+        }).then((data) => {
+          storeData("user", data.data)
+          OneSignal.setExternalUserId("push-" + data.data.id);
+          this.props.navigation.dispatch(this.resetAction());
         });
-        
-        storeData("user", response.data)
-        this.props.navigation.dispatch(this.resetAction());
       } catch (_err) {
         this.setState({ error: 'Houve um problema com o login, verifique suas credenciais!' });
+        this.setState({
+          loadingLogin: false,
+        });
         console.log(_err);
       }
     }
@@ -60,6 +100,11 @@ export default class Login extends Component {
   componentDidMount() {
     this.checaLogin();
   };
+
+  receivedPush() {
+    console.log("PUSH RECEBIDO");
+  }
+
 
   render() {
 
@@ -104,12 +149,14 @@ export default class Login extends Component {
               />
             </Item>
             {this.state.error.length !== 0 && <Text style={styles.ErrorMessage}>{this.state.error}</Text>}
-            <Button block
-              style={styles.loginButton}
-              onPress={this.handleSignInPress}
-            >
-              <Text>Entrar</Text>
-            </Button>
+            {this.state.loadingLogin ? <Spinner style={styles.Spinner} /> :
+              <Button block
+                style={styles.loginButton}
+                onPress={this.handleSignInPress}
+              >
+                <Text>Entrar</Text>
+              </Button>
+            }
           </Form>
           <Button transparent light style={styles.loginButton}>
             <Text>Recuperar Senha</Text>
