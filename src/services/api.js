@@ -7,7 +7,7 @@ import axios from 'axios';
  */
 
 const api = axios.create({
-  baseURL: 'https://www.mesce.com.br/api/',
+  baseURL: 'http://10.0.2.2/api/',
 });
 
 export default api;
