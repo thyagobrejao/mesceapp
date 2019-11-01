@@ -84,7 +84,9 @@ export default class Login extends Component {
         this.setState({
           loadingLogin: false,
         });
-        console.log(_err);
+        console.log(_err.message);
+        console.log(_err.code);
+        console.log(_err.stack);
       }
     }
   };
