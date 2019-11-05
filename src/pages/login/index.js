@@ -6,6 +6,7 @@ import { storeData, getData } from "../../services/storage"
 import api from "../../services/api";
 
 import OneSignal from 'react-native-onesignal';
+import Forgot from './forgot';
 
 var _ = require('lodash');
 
@@ -107,6 +108,10 @@ export default class Login extends Component {
     console.log("PUSH RECEBIDO");
   }
 
+  forgot() {
+    this.props.navigation.navigate({routeName: 'Forgot'});
+  }
+
 
   render() {
 
@@ -160,7 +165,9 @@ export default class Login extends Component {
               </Button>
             }
           </Form>
-          <Button transparent light style={styles.loginButton}>
+          <Button block light
+            style={styles.loginButton}
+            onPress={this.forgot}>
             <Text>Recuperar Senha</Text>
           </Button>
         </Content>
